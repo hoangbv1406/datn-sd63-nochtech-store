@@ -1,0 +1,10 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  devtools:
+    add-properties: true
+
+# application-dev.yml
+jwt:
+  secretKey: dev@123
