@@ -3,6 +3,47 @@
 
 ############################# [ OPERATING SYSTEMS ] #############################
 
+### Windows ###
+[Dd]esktop.ini
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs_vista.db
+ehthumbs.db
+$RECYCLE.BIN/
+*.stackdump
+*.msix
+*.msi
+*.cab
+*.msm
+*.msp
+*.lnk
+
+### macOS ###
+Network Trash Folder
+Temporary Items
+.apdisk
+.AppleDB
+.AppleDesktop
+.AppleDouble
+.LSOverride
+.DS_Store
+.Trashes
+.fseventsd
+.VolumeIcon.icns
+.TemporaryItems
+.Spotlight-V100
+.DocumentRevisions-V100
+.com.apple.timemachine.donotpresent
+._*
+*.icloud
+Icon
+
+### Linux ###
+.directory
+.fuse_hidden*
+.Trash-*
+.nfs*
+*~
 
 ########################## [ IDE CONFIGURATION FILES ] ##########################
 
