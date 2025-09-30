@@ -1,4 +1,17 @@
 services:
+  mysql8-container:
+    container_name: mysql8-container
+    image: mysql:8.2.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: ShopApp
+    ports:
+      - 3307:3306
+    volumes:
+      - ../shopapp-database/database.sql:/docker-entrypoint-initdb.d/init-script.sql
+    networks:
+      - shopapp-network
 
 networks:
   shopapp-network:
