@@ -13,6 +13,21 @@ services:
     networks:
       - shopapp-network
 
+  phpmyadmin8-container:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin8-container
+    restart: always
+    depends_on:
+      - mysql8-container
+    ports:
+      - "8100:80"
+    environment:
+      PMA_HOST: mysql8-container
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 500M
+    networks:
+      - shopapp-network
+
 networks:
   shopapp-network:
     name: shopapp-network
