@@ -1,0 +1,6 @@
+services:
+
+networks:
+  shopapp-network:
+    name: shopapp-network
+    driver: bridge
