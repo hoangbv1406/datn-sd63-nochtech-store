@@ -1,11 +1,15 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.services.orderdetails.OrderDetailService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/order-details")
+@RequiredArgsConstructor
 public class OrderDetailController {
+    private final OrderDetailService orderDetailService;
 
     @PostMapping("")
     public ResponseEntity<String> createOrderDetail() {
