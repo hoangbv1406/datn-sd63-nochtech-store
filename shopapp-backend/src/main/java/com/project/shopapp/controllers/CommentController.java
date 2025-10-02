@@ -1,11 +1,15 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.services.comment.CommentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/comments")
+@RequiredArgsConstructor
 public class CommentController {
+    private final CommentService commentService;
 
     @PostMapping("")
     public ResponseEntity<String> createComment() {
