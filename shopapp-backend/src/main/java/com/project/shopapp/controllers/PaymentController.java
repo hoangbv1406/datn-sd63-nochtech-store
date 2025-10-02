@@ -1,11 +1,15 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.services.vnpay.VNPayService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/payments")
+@RequiredArgsConstructor
 public class PaymentController {
+    private final VNPayService vnPayService;
 
     @PostMapping("/create-payment-url")
     public ResponseEntity<String> createPayment() {
