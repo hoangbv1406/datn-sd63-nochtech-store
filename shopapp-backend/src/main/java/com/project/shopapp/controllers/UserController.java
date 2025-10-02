@@ -1,5 +1,6 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.services.auth.AuthService;
 import com.project.shopapp.services.token.TokenService;
 import com.project.shopapp.services.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final TokenService tokenService;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<String> createUser() {
