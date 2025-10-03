@@ -1,6 +1,8 @@
 package com.project.shopapp.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import lombok.*;
@@ -28,6 +30,7 @@ public class UserDTO extends SocialAccountDTO {
     @JsonProperty("address")
     private String address;
 
+    @NotBlank(message = "Password is required.")
     @JsonProperty("password")
     private String password;
 
@@ -37,6 +40,7 @@ public class UserDTO extends SocialAccountDTO {
     @JsonProperty("date_of_birth")
     private Date dateOfBirth;
 
+    @NotNull(message = "Role is required.")
     @JsonProperty("role_id")
     private Long roleId;
 
