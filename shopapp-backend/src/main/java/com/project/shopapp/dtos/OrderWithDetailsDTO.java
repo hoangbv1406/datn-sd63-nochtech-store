@@ -1,6 +1,9 @@
 package com.project.shopapp.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -14,6 +17,7 @@ import java.util.List;
 @Builder
 public class OrderWithDetailsDTO {
 
+    @Min(value = 1, message = "User ID must be at least 1.")
     @JsonProperty("user_id")
     private Long userId;
 
@@ -23,6 +27,8 @@ public class OrderWithDetailsDTO {
     @JsonProperty("email")
     private String email;
 
+    @NotBlank(message = "Phone number is required.")
+    @Size(min = 5, message = "Phone number must be at least 5 characters.")
     @JsonProperty("phone_number")
     private String phoneNumber;
 
@@ -32,6 +38,7 @@ public class OrderWithDetailsDTO {
     @JsonProperty("note")
     private String note;
 
+    @Min(value = 0, message = "Total money must be at least 0.")
     @JsonProperty("total_money")
     private Float totalMoney;
 
