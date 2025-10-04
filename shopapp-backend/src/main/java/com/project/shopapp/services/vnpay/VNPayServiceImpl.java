@@ -1,4 +1,9 @@
 package com.project.shopapp.services.vnpay;
 
-public interface VNPayServiceImpl {
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class VNPayServiceImpl implements VNPayService {
 }
