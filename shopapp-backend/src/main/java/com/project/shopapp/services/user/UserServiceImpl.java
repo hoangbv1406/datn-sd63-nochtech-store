@@ -1,4 +1,11 @@
 package com.project.shopapp.services.user;
 
-public interface UserServiceImpl {
+import com.project.shopapp.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
 }
