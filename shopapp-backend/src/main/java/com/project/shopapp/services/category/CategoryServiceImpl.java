@@ -12,6 +12,11 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    public Category getCategoryById(long id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found."));
+    }
+
+    @Override
     public Category createCategory(CategoryDTO categoryDTO) {
         Category newCategory = Category.builder().name(categoryDTO.getName()).build();
         return categoryRepository.save(newCategory);

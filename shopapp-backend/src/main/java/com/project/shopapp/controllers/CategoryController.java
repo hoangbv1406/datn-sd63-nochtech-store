@@ -20,6 +20,17 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<ResponseObject> getCategoryById(@PathVariable("categoryId") Long categoryId) {
+        Category existingCategory = categoryService.getCategoryById(categoryId);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .data(existingCategory)
+                .message("Category retrieved successfully. categoryId = " + categoryId)
+                .status(HttpStatus.OK)
+                .build()
+        );
+    }
+
     @PostMapping("")
     public ResponseEntity<ResponseObject> createCategory(
             @Valid @RequestBody CategoryDTO categoryDTO,
@@ -56,11 +67,6 @@ public class CategoryController {
     @GetMapping("")
     public ResponseEntity<String> getAllCategories() {
         return ResponseEntity.ok("Categories retrieved successfully.");
-    }
-
-    @GetMapping("/{categoryId}")
-    public ResponseEntity<String> getCategoryById(@PathVariable("categoryId") Long categoryId) {
-        return ResponseEntity.ok("Category retrieved successfully. categoryId = " + categoryId);
     }
 
 }

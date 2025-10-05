@@ -4,5 +4,6 @@ import com.project.shopapp.dtos.CategoryDTO;
 import com.project.shopapp.models.Category;
 
 public interface CategoryService {
+    Category getCategoryById(long id);
     Category createCategory(CategoryDTO category);
 }
