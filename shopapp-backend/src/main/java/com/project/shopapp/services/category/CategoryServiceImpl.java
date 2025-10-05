@@ -4,6 +4,7 @@ import com.project.shopapp.dtos.CategoryDTO;
 import com.project.shopapp.models.Category;
 import com.project.shopapp.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,6 +36,13 @@ public class CategoryServiceImpl implements CategoryService {
         existingCategory.setName(categoryDTO.getName());
         categoryRepository.save(existingCategory);
         return existingCategory;
+    }
+
+    @Override
+    public Category deleteCategory(long categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new RuntimeException("Category not found."));
+        categoryRepository.deleteById(categoryId);
+        return category;
     }
 
 }
