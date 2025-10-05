@@ -1,9 +1,18 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.dtos.CategoryDTO;
+import com.project.shopapp.models.Category;
+import com.project.shopapp.responses.ResponseObject;
 import com.project.shopapp.services.category.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/categories")
@@ -12,8 +21,26 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping("")
-    public ResponseEntity<String> createCategory() {
-        return ResponseEntity.ok("Category created successfully.");
+    public ResponseEntity<ResponseObject> createCategory(
+            @Valid @RequestBody CategoryDTO categoryDTO,
+            BindingResult result
+    ) {
+        if (result.hasErrors()) {
+            List<String> errorMessages = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
+            return ResponseEntity.ok().body(ResponseObject.builder()
+                    .message(errorMessages.toString())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .data(null)
+                    .build()
+            );
+        }
+        Category category = categoryService.createCategory(categoryDTO);
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("Category created successfully.")
+                .status(HttpStatus.OK)
+                .data(category)
+                .build()
+        );
     }
 
     @PutMapping("/{categoryId}")
