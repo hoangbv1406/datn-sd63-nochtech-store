@@ -66,8 +66,17 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<String> updateCategory(@PathVariable("categoryId") Long categoryId) {
-        return ResponseEntity.ok("Category updated successfully. categoryId = " + categoryId);
+    public ResponseEntity<ResponseObject> updateCategory(
+            @PathVariable("categoryId") Long categoryId,
+            @Valid @RequestBody CategoryDTO categoryDTO
+    ) {
+        categoryService.updateCategory(categoryId, categoryDTO);
+        return ResponseEntity.ok(ResponseObject
+                .builder()
+                .data(categoryService.getCategoryById(categoryId))
+                .message("Category updated successfully. categoryId = " + categoryId)
+                .build()
+        );
     }
 
     @DeleteMapping("/{categoryId}")

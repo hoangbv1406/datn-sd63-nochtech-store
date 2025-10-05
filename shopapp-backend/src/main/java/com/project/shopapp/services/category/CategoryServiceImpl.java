@@ -29,4 +29,12 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.save(newCategory);
     }
 
+    @Override
+    public Category updateCategory(long categoryId, CategoryDTO categoryDTO) {
+        Category existingCategory = getCategoryById(categoryId);
+        existingCategory.setName(categoryDTO.getName());
+        categoryRepository.save(existingCategory);
+        return existingCategory;
+    }
+
 }
