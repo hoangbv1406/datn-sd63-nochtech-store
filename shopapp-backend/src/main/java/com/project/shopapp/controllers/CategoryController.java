@@ -20,6 +20,17 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
+    @GetMapping("")
+    public ResponseEntity<ResponseObject> getAllCategories() {
+        List<Category> categories = categoryService.getAllCategories();
+        return ResponseEntity.ok(ResponseObject.builder()
+                .message("Categories retrieved successfully.")
+                .status(HttpStatus.OK)
+                .data(categories)
+                .build()
+        );
+    }
+
     @GetMapping("/{categoryId}")
     public ResponseEntity<ResponseObject> getCategoryById(@PathVariable("categoryId") Long categoryId) {
         Category existingCategory = categoryService.getCategoryById(categoryId);
@@ -62,11 +73,6 @@ public class CategoryController {
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable("categoryId") Long categoryId) {
         return ResponseEntity.ok("Category deleted successfully. categoryId = " + categoryId);
-    }
-
-    @GetMapping("")
-    public ResponseEntity<String> getAllCategories() {
-        return ResponseEntity.ok("Categories retrieved successfully.");
     }
 
 }
