@@ -67,8 +67,17 @@ public class ProductController {
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<String> updateProduct(@PathVariable("productId") Long productId) {
-        return ResponseEntity.ok("Product updated successfully. productId = " + productId);
+    public ResponseEntity<ResponseObject> updateProduct(
+            @PathVariable("productId") Long productId,
+            @RequestBody ProductDTO productDTO
+    ) {
+        Product updatedProduct = productService.updateProduct(productId, productDTO);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .data(updatedProduct)
+                .message("Product updated successfully. productId = " + productId)
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
     @DeleteMapping("/{productId}")

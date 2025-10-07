@@ -34,4 +34,25 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(newProduct);
     }
 
+    @Override
+    public Product updateProduct(long id, ProductDTO productDTO) {
+        Product existingProduct = getProductById(id);
+        if (existingProduct != null) {
+            if (productDTO.getName() != null && !productDTO.getName().isEmpty()) {
+                existingProduct.setName(productDTO.getName());
+            }
+            if (productDTO.getPrice() >= 0) {
+                existingProduct.setPrice(productDTO.getPrice());
+            }
+            if (productDTO.getDescription() != null && !productDTO.getDescription().isEmpty()) {
+                existingProduct.setDescription(productDTO.getDescription());
+            }
+            if (productDTO.getThumbnail() != null && !productDTO.getThumbnail().isEmpty()) {
+                existingProduct.setThumbnail(productDTO.getThumbnail());
+            }
+            return productRepository.save(existingProduct);
+        }
+        return null;
+    }
+
 }
