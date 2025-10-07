@@ -1,5 +1,6 @@
 package com.project.shopapp.services.product;
 
+import com.project.shopapp.dtos.ProductDTO;
 import com.project.shopapp.models.Product;
 import com.project.shopapp.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,17 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getProductById(long productId) {
         return productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found."));
+    }
+
+    @Override
+    public Product createProduct(ProductDTO productDTO) {
+        Product newProduct = Product.builder()
+                .name(productDTO.getName())
+                .price(productDTO.getPrice())
+                .thumbnail(productDTO.getThumbnail())
+                .description(productDTO.getDescription())
+                .build();
+        return productRepository.save(newProduct);
     }
 
 }
