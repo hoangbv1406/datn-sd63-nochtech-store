@@ -27,6 +27,17 @@ public class ProductController {
         );
     }
 
+    @GetMapping("/{productId}")
+    public ResponseEntity<ResponseObject> getProductById(@PathVariable("productId") Long productId) {
+        Product product = productService.getProductById(productId);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .data(product)
+                .message("Product retrieved successfully. productId = " + productId)
+                .status(HttpStatus.OK)
+                .build()
+        );
+    }
+
     @PostMapping("")
     public ResponseEntity<String> createProduct() {
         return ResponseEntity.ok("Product created successfully.");
@@ -40,11 +51,6 @@ public class ProductController {
     @DeleteMapping("/{productId}")
     public ResponseEntity<String> deleteProduct(@PathVariable("productId") Long productId) {
         return ResponseEntity.ok("Product deleted successfully. productId = " + productId);
-    }
-
-    @GetMapping("/{productId}")
-    public ResponseEntity<String> getProductById(@PathVariable("productId") Long productId) {
-        return ResponseEntity.ok("Product retrieved successfully. productId = " + productId);
     }
 
     @GetMapping("/by-ids")
