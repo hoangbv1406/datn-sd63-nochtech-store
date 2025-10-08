@@ -1,7 +1,11 @@
 package com.project.shopapp.services.product;
 
 import com.project.shopapp.dtos.ProductDTO;
+import com.project.shopapp.dtos.ProductImageDTO;
+import com.project.shopapp.exceptions.InvalidParamException;
 import com.project.shopapp.models.Product;
+import com.project.shopapp.models.ProductImage;
+import com.project.shopapp.repositories.ProductImageRepository;
 import com.project.shopapp.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final ProductImageRepository productImageRepository;
 
     @Override
     public List<Product> getAllProducts() {
@@ -60,6 +65,24 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found."));
         productRepository.deleteById(productId);
         return product;
+    }
+
+    @Override
+    public ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws Exception {
+        Product existingProduct = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found."));
+        ProductImage newProductImage = ProductImage.builder()
+                .product(existingProduct)
+                .imageUrl(productImageDTO.getImageUrl())
+                .build();
+        int size = productImageRepository.findByProductId(productId).size();
+        if (size >= ProductImage.MAXIMUM_IMAGES_PER_PRODUCT) {
+            throw new InvalidParamException("Maximum allowed images: " + ProductImage.MAXIMUM_IMAGES_PER_PRODUCT);
+        }
+        if (existingProduct.getThumbnail() == null) {
+            existingProduct.setThumbnail(newProductImage.getImageUrl());
+        }
+        productRepository.save(existingProduct);
+        return productImageRepository.save(newProductImage);
     }
 
 }
