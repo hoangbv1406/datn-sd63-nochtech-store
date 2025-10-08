@@ -9,6 +9,7 @@ import com.project.shopapp.services.product.ProductService;
 import com.project.shopapp.utils.FileUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,8 +154,22 @@ public class ProductController {
     }
 
     @GetMapping("/images/{imageName}")
-    public ResponseEntity<String> viewImage(@PathVariable("imageName") String imageName) {
-        return ResponseEntity.ok("Image retrieved successfully. imageName = " + imageName);
+    public ResponseEntity<?> viewImage(@PathVariable("imageName") String imageName) {
+        try {
+            java.nio.file.Path imagePath = Paths.get("uploads/" + imageName);
+            UrlResource resource = new UrlResource(imagePath.toUri());
+            if (resource.exists()) {
+                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);
+            } else {
+                System.out.println("Image not found: uploads/" + imageName);
+                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(
+                        new UrlResource(Paths.get("uploads/notfound.jpeg").toUri())
+                );
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to retrieve image: " + e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/like/{productId}")
