@@ -1,11 +1,16 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.models.User;
+import com.project.shopapp.responses.ResponseObject;
 import com.project.shopapp.services.auth.AuthService;
 import com.project.shopapp.services.token.TokenService;
 import com.project.shopapp.services.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/users")
@@ -15,14 +20,20 @@ public class UserController {
     private final TokenService tokenService;
     private final AuthService authService;
 
+    @GetMapping("")
+    public ResponseEntity<ResponseObject> getAllUser() {
+        List<User> user = userService.getAllUsers();
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("Users retrieved successfully.")
+                .status(HttpStatus.OK)
+                .data(user)
+                .build()
+        );
+    }
+
     @PostMapping("/register")
     public ResponseEntity<String> createUser() {
         return ResponseEntity.ok("User registered successfully.");
-    }
-
-    @GetMapping("")
-    public ResponseEntity<String> getAllUser() {
-        return ResponseEntity.ok("Users retrieved successfully.");
     }
 
     @PostMapping("/details")
