@@ -6,3 +6,6 @@ spring:
     name: shopapp-backend
   profiles:
     active: @spring.profiles.active@
+
+api:
+  prefix: /api/v1

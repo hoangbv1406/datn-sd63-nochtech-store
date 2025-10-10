@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,9 @@ import java.util.List;
 public class JwtTokenFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final JwtTokenUtils jwtTokenUtil;
+
+    @Value("${api.prefix}")
+    private String apiPrefix;
 
     @Override
     protected void doFilterInternal(
@@ -63,13 +67,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private boolean isBypassToken(@NonNull HttpServletRequest request) {
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
-                Pair.of("%s/products**", "GET"),
-                Pair.of("%s/categories**", "GET"),
-
-                Pair.of("%s/users/register", "POST"),
-                Pair.of("%s/users/login", "POST"),
-                Pair.of("%s/users/profile-images/**", "GET"),
-                Pair.of("%s/users/refreshToken", "POST")
+                Pair.of(String.format("%s/roles**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
+                Pair.of(String.format("%s/users/login", apiPrefix), "POST"),
+                Pair.of(String.format("%s/users/profile-images/**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/users/refreshToken", apiPrefix), "POST"),
+                Pair.of(String.format("%s/categories**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/products**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/comments**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/coupons**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/policies**", apiPrefix), "GET")
         );
 
         String requestPath = request.getServletPath();
