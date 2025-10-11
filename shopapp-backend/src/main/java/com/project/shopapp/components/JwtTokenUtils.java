@@ -4,8 +4,7 @@ import com.project.shopapp.exceptions.InvalidParamException;
 import com.project.shopapp.models.Token;
 import com.project.shopapp.models.User;
 import com.project.shopapp.repositories.TokenRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +78,26 @@ public class JwtTokenUtils {
 
     public String getSubject(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public boolean validateToken(String token, User userDetails) {
+        try {
+            String subject = extractClaim(token, Claims::getSubject);
+            Token existingToken = tokenRepository.findByToken(token);
+            if (existingToken == null || existingToken.isRevoked() == true || !userDetails.isActive()) {
+                return false;
+            }
+            return (subject.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        } catch (MalformedJwtException e) {
+            System.out.println("Invalid JWT token: {}");
+        } catch (ExpiredJwtException e) {
+            System.out.println("JWT token is expired: {}");
+        } catch (UnsupportedJwtException e) {
+            System.out.println("JWT token is unsupported: {}");
+        } catch (IllegalArgumentException e) {
+            System.out.println("JWT claims string is empty: {}");
+        }
+        return false;
     }
 
 }
