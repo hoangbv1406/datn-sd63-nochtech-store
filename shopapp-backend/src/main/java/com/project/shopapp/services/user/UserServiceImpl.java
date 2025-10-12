@@ -6,10 +6,13 @@ import com.project.shopapp.dtos.UserLoginDTO;
 import com.project.shopapp.dtos.UserUpdateDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.exceptions.ExpiredTokenException;
+import com.project.shopapp.exceptions.InvalidPasswordException;
 import com.project.shopapp.exceptions.PermissionDenyException;
 import com.project.shopapp.models.Role;
+import com.project.shopapp.models.Token;
 import com.project.shopapp.models.User;
 import com.project.shopapp.repositories.RoleRepository;
+import com.project.shopapp.repositories.TokenRepository;
 import com.project.shopapp.repositories.UserRepository;
 import com.project.shopapp.utils.ValidationUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtils jwtTokenUtil;
 
@@ -187,6 +191,18 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
         existingUser.setProfileImage(imageName);
         userRepository.save(existingUser);
+    }
+
+    @Override
+    public void resetPassword(Long userId, String newPassword) throws DataNotFoundException {
+        User existingUser = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        existingUser.setPassword(encodedPassword);
+        userRepository.save(existingUser);
+        List<Token> tokens = tokenRepository.findByUser(existingUser);
+        for (Token token : tokens) {
+            tokenRepository.delete(token);
+        }
     }
 
 }

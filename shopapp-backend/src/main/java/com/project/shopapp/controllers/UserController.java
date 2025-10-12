@@ -4,6 +4,8 @@ import com.project.shopapp.components.SecurityUtils;
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.dtos.UserLoginDTO;
 import com.project.shopapp.dtos.UserUpdateDTO;
+import com.project.shopapp.exceptions.DataNotFoundException;
+import com.project.shopapp.exceptions.InvalidPasswordException;
 import com.project.shopapp.models.Token;
 import com.project.shopapp.models.User;
 import com.project.shopapp.responses.ResponseObject;
@@ -30,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/users")
@@ -261,8 +264,31 @@ public class UserController {
     }
 
     @PutMapping("/reset-password/{userId}")
-    public ResponseEntity<String> resetPassword(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok("Password reset successfully. userId = " + userId);
+    public ResponseEntity<ResponseObject> resetPassword(@PathVariable("userId") Long userId) {
+        try {
+            String newPassword = UUID.randomUUID().toString().substring(0, 5);
+            userService.resetPassword(userId, newPassword);
+            return ResponseEntity.ok(ResponseObject.builder()
+                    .message("Password reset successfully. userId = " + userId)
+                    .data(newPassword)
+                    .status(HttpStatus.OK)
+                    .build()
+            );
+        } catch (InvalidPasswordException e) {
+            return ResponseEntity.ok(ResponseObject.builder()
+                    .message("Invalid password")
+                    .data("")
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build()
+            );
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.ok(ResponseObject.builder()
+                    .message("User not found")
+                    .data("")
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build()
+            );
+        }
     }
 
     @PutMapping("/block/{userId}/{active}")
