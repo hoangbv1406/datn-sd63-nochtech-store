@@ -17,5 +17,6 @@ public interface UserService {
     String login(UserLoginDTO userLoginDT) throws Exception;
     String loginSocial(UserLoginDTO userLoginDTO) throws Exception;
     void changeProfileImage(Long userId, String imageName) throws Exception;
+    void blockOrEnable(Long userId, Boolean active) throws DataNotFoundException;
     void resetPassword(Long userId, String newPassword) throws InvalidPasswordException, DataNotFoundException;
 }

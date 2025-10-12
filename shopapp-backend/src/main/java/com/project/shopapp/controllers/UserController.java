@@ -292,12 +292,18 @@ public class UserController {
     }
 
     @PutMapping("/block/{userId}/{active}")
-    public ResponseEntity<String> blockOrEnable(
+    public ResponseEntity<ResponseObject> blockOrEnable(
             @PathVariable("userId") Long userId,
             @PathVariable("active") Integer active
-    ) {
-        String status = (active == 1) ? "enabled" : "blocked";
-        return ResponseEntity.ok("User " + status + " successfully. userId = " + userId);
+    ) throws Exception {
+        userService.blockOrEnable(userId, active > 0);
+        String message = active > 0 ? "Successfully enabled the user." : "Successfully blocked the user.";
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message(message)
+                .status(HttpStatus.OK)
+                .data(null)
+                .build()
+        );
     }
 
     public boolean isMobileDevice(String userAgent) {
