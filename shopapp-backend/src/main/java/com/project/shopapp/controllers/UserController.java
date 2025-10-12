@@ -17,6 +17,7 @@ import com.project.shopapp.utils.ValidationUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -175,8 +177,20 @@ public class UserController {
     }
 
     @GetMapping("/profile-images/{imageName}")
-    public ResponseEntity<String> viewImage(@PathVariable("imageName") String imageName) {
-        return ResponseEntity.ok("Profile image retrieved successfully. imageName = " + imageName);
+    public ResponseEntity<?> viewImage(@PathVariable("imageName") String imageName) {
+        try {
+            java.nio.file.Path imagePath = Paths.get("uploads/" + imageName);
+            UrlResource resource = new UrlResource(imagePath.toUri());
+            if (resource.exists()) {
+                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);
+            } else {
+                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(
+                        new UrlResource(Paths.get("uploads/default-profile-image.jpeg").toUri())
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/login")
