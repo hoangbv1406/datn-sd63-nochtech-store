@@ -188,8 +188,15 @@ public class ProductController {
     }
 
     @PostMapping("/unlike/{productId}")
-    public ResponseEntity<String> unlikeProduct(@PathVariable("productId") Long productId) {
-        return ResponseEntity.ok("Product unliked successfully. productId = " + productId);
+    public ResponseEntity<ResponseObject> unlikeProduct(@PathVariable("productId") Long productId) throws Exception {
+        User loginUser = securityUtils.getLoggedInUser();
+        Product unlikedProduct = productService.unlikeProduct(loginUser.getId(), productId);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .data(unlikedProduct)
+                .message("Product unliked successfully. productId = " + productId)
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
     @PostMapping("/favorite-products")

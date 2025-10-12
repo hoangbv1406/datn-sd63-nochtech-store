@@ -107,4 +107,16 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findById(productId).orElse(null);
     }
 
+    @Override
+    public Product unlikeProduct(Long userId, Long productId) throws Exception {
+        if (!userRepository.existsById(userId) || !productRepository.existsById(productId)) {
+            throw new DataNotFoundException("User or product not found");
+        }
+        if (favoriteRepository.existsByUserIdAndProductId(userId, productId)) {
+            Favorite favorite = favoriteRepository.findByUserIdAndProductId(userId, productId);
+            favoriteRepository.delete(favorite);
+        }
+        return productRepository.findById(productId).orElse(null);
+    }
+
 }

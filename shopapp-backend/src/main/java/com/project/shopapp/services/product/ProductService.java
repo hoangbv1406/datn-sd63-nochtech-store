@@ -14,5 +14,6 @@ public interface ProductService {
     Product updateProduct(long id, ProductDTO productDTO);
     Product deleteProduct(long id);
     Product likeProduct(Long userId, Long productId) throws Exception;
+    Product unlikeProduct(Long userId, Long productId) throws Exception;
     ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws Exception;
 }
