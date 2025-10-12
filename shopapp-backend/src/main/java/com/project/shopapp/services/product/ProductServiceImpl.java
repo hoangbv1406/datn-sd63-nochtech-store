@@ -7,14 +7,18 @@ import com.project.shopapp.exceptions.InvalidParamException;
 import com.project.shopapp.models.Favorite;
 import com.project.shopapp.models.Product;
 import com.project.shopapp.models.ProductImage;
+import com.project.shopapp.models.User;
 import com.project.shopapp.repositories.FavoriteRepository;
 import com.project.shopapp.repositories.ProductImageRepository;
 import com.project.shopapp.repositories.ProductRepository;
 import com.project.shopapp.repositories.UserRepository;
+import com.project.shopapp.responses.product.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -117,6 +121,16 @@ public class ProductServiceImpl implements ProductService {
             favoriteRepository.delete(favorite);
         }
         return productRepository.findById(productId).orElse(null);
+    }
+
+    @Override
+    public List<ProductResponse> findFavoriteProductsByUserId(Long userId) throws Exception {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new Exception("User not found with ID: " + userId);
+        }
+        List<Product> favoriteProducts = productRepository.findFavoriteProductsByUserId(userId);
+        return favoriteProducts.stream().map(ProductResponse::fromProduct).collect(Collectors.toList());
     }
 
 }

@@ -4,6 +4,7 @@ import com.project.shopapp.dtos.ProductDTO;
 import com.project.shopapp.dtos.ProductImageDTO;
 import com.project.shopapp.models.Product;
 import com.project.shopapp.models.ProductImage;
+import com.project.shopapp.responses.product.ProductResponse;
 
 import java.util.List;
 
@@ -16,4 +17,5 @@ public interface ProductService {
     Product likeProduct(Long userId, Long productId) throws Exception;
     Product unlikeProduct(Long userId, Long productId) throws Exception;
     ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws Exception;
+    List<ProductResponse> findFavoriteProductsByUserId(Long userId) throws Exception;
 }

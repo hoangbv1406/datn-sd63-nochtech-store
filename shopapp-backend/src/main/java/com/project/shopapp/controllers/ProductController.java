@@ -7,6 +7,7 @@ import com.project.shopapp.models.Product;
 import com.project.shopapp.models.ProductImage;
 import com.project.shopapp.models.User;
 import com.project.shopapp.responses.ResponseObject;
+import com.project.shopapp.responses.product.ProductResponse;
 import com.project.shopapp.services.product.ProductService;
 import com.project.shopapp.utils.FileUtils;
 import jakarta.validation.Valid;
@@ -200,8 +201,15 @@ public class ProductController {
     }
 
     @PostMapping("/favorite-products")
-    public ResponseEntity<String> findFavoriteProductsByUserId() {
-        return ResponseEntity.ok("Favorite products retrieved successfully.");
+    public ResponseEntity<ResponseObject> findFavoriteProductsByUserId() throws Exception {
+        User loginUser = securityUtils.getLoggedInUser();
+        List<ProductResponse> favoriteProducts = productService.findFavoriteProductsByUserId(loginUser.getId());
+        return ResponseEntity.ok(ResponseObject.builder()
+                .data(favoriteProducts)
+                .message("Favorite products retrieved successfully.")
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
     @PostMapping("/generateFakeProducts")
