@@ -100,4 +100,54 @@ public class UserServiceImpl implements UserService {
         return jwtTokenUtil.generateToken(existingUser);
     }
 
+    @Override
+    public String loginSocial(UserLoginDTO userLoginDTO) throws Exception {
+        Optional<User> optionalUser = Optional.empty();
+        Role roleUser = roleRepository.findByName(Role.USER).orElseThrow(() -> new DataNotFoundException(""));
+
+        // Google Account ID
+        if (userLoginDTO.isGoogleAccountIdValid()) {
+            optionalUser = userRepository.findByGoogleAccountId(userLoginDTO.getGoogleAccountId());
+            if (optionalUser.isEmpty()) {
+                User newUser = User.builder()
+                        .fullName(Optional.ofNullable(userLoginDTO.getFullname()).orElse(""))
+                        .email(Optional.ofNullable(userLoginDTO.getEmail()).orElse(""))
+                        .profileImage(Optional.ofNullable(userLoginDTO.getProfileImage()).orElse(""))
+                        .role(roleUser)
+                        .googleAccountId(userLoginDTO.getGoogleAccountId())
+                        .password("")
+                        .active(true)
+                        .build();
+                newUser = userRepository.save(newUser);
+                optionalUser = Optional.of(newUser);
+            }
+        }
+        // Facebook Account ID
+        else if (userLoginDTO.isFacebookAccountIdValid()) {
+            optionalUser = userRepository.findByFacebookAccountId(userLoginDTO.getFacebookAccountId());
+            if (optionalUser.isEmpty()) {
+                User newUser = User.builder()
+                        .fullName(Optional.ofNullable(userLoginDTO.getFullname()).orElse(""))
+                        .email(Optional.ofNullable(userLoginDTO.getEmail()).orElse(""))
+                        .profileImage(Optional.ofNullable(userLoginDTO.getProfileImage()).orElse(""))
+                        .role(roleUser)
+                        .facebookAccountId(userLoginDTO.getFacebookAccountId())
+                        .password("")
+                        .active(true)
+                        .build();
+                newUser = userRepository.save(newUser);
+                optionalUser = Optional.of(newUser);
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid social account information.");
+        }
+
+        User user = optionalUser.get();
+        if (!user.isActive()) {
+            throw new DataNotFoundException("");
+        }
+
+        return jwtTokenUtil.generateToken(user);
+    }
+
 }

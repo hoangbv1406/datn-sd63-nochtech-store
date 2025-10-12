@@ -11,4 +11,5 @@ public interface UserService {
     User createUser(UserDTO userDTO) throws Exception;
     User getUserDetailsFromToken(String token) throws Exception;
     String login(UserLoginDTO userLoginDT) throws Exception;
+    String loginSocial(UserLoginDTO userLoginDTO) throws Exception;
 }

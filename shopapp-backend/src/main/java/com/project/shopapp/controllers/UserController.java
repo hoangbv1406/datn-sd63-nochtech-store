@@ -148,8 +148,30 @@ public class UserController {
     }
 
     @PostMapping("/login/social")
-    public ResponseEntity<String> loginSocial() {
-        return ResponseEntity.ok("User logged in with social account successfully.");
+    public ResponseEntity<ResponseObject> loginSocial(
+            @Valid @RequestBody UserLoginDTO userLoginDTO,
+            HttpServletRequest request
+    ) throws Exception {
+        String token = userService.loginSocial(userLoginDTO);
+        String userAgent = request.getHeader("User-Agent");
+        User userDetail = userService.getUserDetailsFromToken(token);
+        Token jwtToken = tokenService.addToken(userDetail, token, isMobileDevice(userAgent));
+
+        LoginResponse loginResponse = LoginResponse.builder()
+                .message("LOGIN SUCCESSFULLY")
+                .token(jwtToken.getToken())
+                .tokenType(jwtToken.getTokenType())
+                .refreshToken(jwtToken.getRefreshToken())
+                .username(userDetail.getUsername())
+                .roles(userDetail.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .id(userDetail.getId())
+                .build();
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("User logged in with social account successfully.")
+                .data(loginResponse)
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
     @GetMapping("/auth/social/callback")
