@@ -3,6 +3,7 @@ package com.project.shopapp.controllers;
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.models.User;
 import com.project.shopapp.responses.ResponseObject;
+import com.project.shopapp.responses.user.UserResponse;
 import com.project.shopapp.services.auth.AuthService;
 import com.project.shopapp.services.token.TokenService;
 import com.project.shopapp.services.user.UserService;
@@ -86,8 +87,17 @@ public class UserController {
     }
 
     @PostMapping("/details")
-    public ResponseEntity<String> getUserDetails() {
-        return ResponseEntity.ok("User details retrieved successfully.");
+    public ResponseEntity<ResponseObject> getUserDetails(
+            @RequestHeader("Authorization") String authorizationHeader
+    ) throws Exception {
+        String extractedToken = authorizationHeader.substring(7);
+        User user = userService.getUserDetailsFromToken(extractedToken);
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("User details retrieved successfully.")
+                .data(UserResponse.fromUser(user))
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
     @PutMapping("/details/{userId}")

@@ -1,18 +1,22 @@
 package com.project.shopapp.services.user;
 
+import com.project.shopapp.components.JwtTokenUtils;
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
+import com.project.shopapp.exceptions.ExpiredTokenException;
 import com.project.shopapp.exceptions.PermissionDenyException;
 import com.project.shopapp.models.Role;
 import com.project.shopapp.models.User;
 import com.project.shopapp.repositories.RoleRepository;
 import com.project.shopapp.repositories.UserRepository;
+import com.project.shopapp.utils.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenUtils jwtTokenUtil;
 
     @Override
     public List<User> getAllUsers() {
@@ -56,6 +61,20 @@ public class UserServiceImpl implements UserService {
             newUser.setPassword(encodedPassword);
         }
         return userRepository.save(newUser);
+    }
+
+    @Override
+    public User getUserDetailsFromToken(String token) throws Exception {
+        if (jwtTokenUtil.isTokenExpired(token)) {
+            throw new ExpiredTokenException("Token is expired");
+        }
+        String subject = jwtTokenUtil.getSubject(token);
+        Optional<User> user;
+        user = userRepository.findByPhoneNumber(subject);
+        if (user.isEmpty() && ValidationUtils.isValidEmail(subject)) {
+            user = userRepository.findByEmail(subject);
+        }
+        return user.orElseThrow(() -> new Exception("User not found"));
     }
 
 }
