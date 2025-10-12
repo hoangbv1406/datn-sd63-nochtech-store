@@ -9,6 +9,9 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 123456
+  sendgrid:
+    api-key: SG.
+    from-email: hoangbv.dev@gmail.com
 
 # application-dev.yml
 jwt:
