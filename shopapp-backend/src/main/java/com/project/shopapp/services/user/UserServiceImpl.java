@@ -3,6 +3,7 @@ package com.project.shopapp.services.user;
 import com.project.shopapp.components.JwtTokenUtils;
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.dtos.UserLoginDTO;
+import com.project.shopapp.dtos.UserUpdateDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.exceptions.ExpiredTokenException;
 import com.project.shopapp.exceptions.PermissionDenyException;
@@ -148,6 +149,37 @@ public class UserServiceImpl implements UserService {
         }
 
         return jwtTokenUtil.generateToken(user);
+    }
+
+    @Override
+    public User updateUser(Long userId, UserUpdateDTO userUpdateDTO) throws Exception {
+        User existingUser = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("User not found"));
+        if (userUpdateDTO.getFullName() != null) {
+            existingUser.setFullName(userUpdateDTO.getFullName());
+        }
+        if (userUpdateDTO.getAddress() != null) {
+            existingUser.setAddress(userUpdateDTO.getAddress());
+        }
+        if (userUpdateDTO.getDateOfBirth() != null) {
+            existingUser.setDateOfBirth(userUpdateDTO.getDateOfBirth());
+        }
+        if (userUpdateDTO.isFacebookAccountIdValid()) {
+            existingUser.setFacebookAccountId(userUpdateDTO.getFacebookAccountId());
+        }
+        if (userUpdateDTO.isGoogleAccountIdValid()) {
+            existingUser.setGoogleAccountId(userUpdateDTO.getGoogleAccountId());
+        }
+
+        if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
+            if (!userUpdateDTO.getPassword().equals(userUpdateDTO.getRetypePassword())) {
+                throw new DataNotFoundException("Password and retype password not the same");
+            }
+            String newPassword = userUpdateDTO.getPassword();
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            existingUser.setPassword(encodedPassword);
+        }
+
+        return userRepository.save(existingUser);
     }
 
 }

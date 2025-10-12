@@ -2,6 +2,7 @@ package com.project.shopapp.controllers;
 
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.dtos.UserLoginDTO;
+import com.project.shopapp.dtos.UserUpdateDTO;
 import com.project.shopapp.models.Token;
 import com.project.shopapp.models.User;
 import com.project.shopapp.responses.ResponseObject;
@@ -106,8 +107,23 @@ public class UserController {
     }
 
     @PutMapping("/details/{userId}")
-    public ResponseEntity<String> updateUserDetails(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok("User details updated successfully. userId = " + userId);
+    public ResponseEntity<ResponseObject> updateUserDetails(
+            @PathVariable("userId") Long userId,
+            @RequestBody UserUpdateDTO userUpdateDTO,
+            @RequestHeader("Authorization") String authorizationHeader
+    ) throws Exception {
+        String extractedToken = authorizationHeader.substring(7);
+        User user = userService.getUserDetailsFromToken(extractedToken);
+        if (user.getId() != userId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        User updatedUser = userService.updateUser(userId, userUpdateDTO);
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("User details updated successfully. userId = " + userId)
+                .data(UserResponse.fromUser(updatedUser))
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
     @PostMapping("/upload-profile-image")
