@@ -1,17 +1,22 @@
 package com.project.shopapp.controllers;
 
 import com.project.shopapp.dtos.UserDTO;
+import com.project.shopapp.dtos.UserLoginDTO;
+import com.project.shopapp.models.Token;
 import com.project.shopapp.models.User;
 import com.project.shopapp.responses.ResponseObject;
+import com.project.shopapp.responses.user.LoginResponse;
 import com.project.shopapp.responses.user.UserResponse;
 import com.project.shopapp.services.auth.AuthService;
 import com.project.shopapp.services.token.TokenService;
 import com.project.shopapp.services.user.UserService;
 import com.project.shopapp.utils.ValidationUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -116,8 +121,30 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login() {
-        return ResponseEntity.ok("User logged in successfully.");
+    public ResponseEntity<ResponseObject> login(
+            @Valid @RequestBody UserLoginDTO userLoginDTO,
+            HttpServletRequest request
+    ) throws Exception {
+        String token = userService.login(userLoginDTO);
+        String userAgent = request.getHeader("User-Agent");
+        User userDetail = userService.getUserDetailsFromToken(token);
+        Token jwtToken = tokenService.addToken(userDetail, token, isMobileDevice(userAgent));
+
+        LoginResponse loginResponse = LoginResponse.builder()
+                .message("")
+                .token(jwtToken.getToken())
+                .tokenType(jwtToken.getTokenType())
+                .refreshToken(jwtToken.getRefreshToken())
+                .username(userDetail.getUsername())
+                .roles(userDetail.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .id(userDetail.getId())
+                .build();
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("User logged in successfully.")
+                .data(loginResponse)
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
     @PostMapping("/login/social")

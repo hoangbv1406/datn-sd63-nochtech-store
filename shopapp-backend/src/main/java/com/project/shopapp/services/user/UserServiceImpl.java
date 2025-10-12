@@ -2,6 +2,7 @@ package com.project.shopapp.services.user;
 
 import com.project.shopapp.components.JwtTokenUtils;
 import com.project.shopapp.dtos.UserDTO;
+import com.project.shopapp.dtos.UserLoginDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.exceptions.ExpiredTokenException;
 import com.project.shopapp.exceptions.PermissionDenyException;
@@ -75,6 +76,28 @@ public class UserServiceImpl implements UserService {
             user = userRepository.findByEmail(subject);
         }
         return user.orElseThrow(() -> new Exception("User not found"));
+    }
+
+    @Override
+    public String login(UserLoginDTO userLoginDTO) throws Exception {
+        Optional<User> optionalUser = Optional.empty();
+
+        if (userLoginDTO.getPhoneNumber() != null && !userLoginDTO.getPhoneNumber().isBlank()) {
+            optionalUser = userRepository.findByPhoneNumber(userLoginDTO.getPhoneNumber());
+        }
+        if (optionalUser.isEmpty() && userLoginDTO.getEmail() != null) {
+            optionalUser = userRepository.findByEmail(userLoginDTO.getEmail());
+        }
+        if (optionalUser.isEmpty()) {
+            throw new DataNotFoundException("");
+        }
+
+        User existingUser = optionalUser.get();
+        if (!existingUser.isActive()) {
+            throw new DataNotFoundException("");
+        }
+
+        return jwtTokenUtil.generateToken(existingUser);
     }
 
 }
