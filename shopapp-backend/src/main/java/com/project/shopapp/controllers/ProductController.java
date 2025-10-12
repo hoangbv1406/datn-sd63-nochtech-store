@@ -1,9 +1,11 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.components.SecurityUtils;
 import com.project.shopapp.dtos.ProductDTO;
 import com.project.shopapp.dtos.ProductImageDTO;
 import com.project.shopapp.models.Product;
 import com.project.shopapp.models.ProductImage;
+import com.project.shopapp.models.User;
 import com.project.shopapp.responses.ResponseObject;
 import com.project.shopapp.services.product.ProductService;
 import com.project.shopapp.utils.FileUtils;
@@ -27,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+    private final SecurityUtils securityUtils;
 
     @GetMapping("")
     public ResponseEntity<ResponseObject> getAllProducts() {
@@ -173,8 +176,15 @@ public class ProductController {
     }
 
     @PostMapping("/like/{productId}")
-    public ResponseEntity<String> likeProduct(@PathVariable("productId") Long productId) {
-        return ResponseEntity.ok("Product liked successfully. productId = " + productId);
+    public ResponseEntity<ResponseObject> likeProduct(@PathVariable("productId") Long productId) throws Exception {
+        User loginUser = securityUtils.getLoggedInUser();
+        Product likedProduct = productService.likeProduct(loginUser.getId(), productId);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .data(likedProduct)
+                .message("Product liked successfully. productId = " + productId)
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
     @PostMapping("/unlike/{productId}")

@@ -2,11 +2,15 @@ package com.project.shopapp.services.product;
 
 import com.project.shopapp.dtos.ProductDTO;
 import com.project.shopapp.dtos.ProductImageDTO;
+import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.exceptions.InvalidParamException;
+import com.project.shopapp.models.Favorite;
 import com.project.shopapp.models.Product;
 import com.project.shopapp.models.ProductImage;
+import com.project.shopapp.repositories.FavoriteRepository;
 import com.project.shopapp.repositories.ProductImageRepository;
 import com.project.shopapp.repositories.ProductRepository;
+import com.project.shopapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +21,8 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
+    private final UserRepository userRepository;
+    private final FavoriteRepository favoriteRepository;
 
     @Override
     public List<Product> getAllProducts() {
@@ -83,6 +89,22 @@ public class ProductServiceImpl implements ProductService {
         }
         productRepository.save(existingProduct);
         return productImageRepository.save(newProductImage);
+    }
+
+    @Override
+    public Product likeProduct(Long userId, Long productId) throws Exception {
+        if (!userRepository.existsById(userId) || !productRepository.existsById(productId)) {
+            throw new DataNotFoundException("User or product not found");
+        }
+        if (favoriteRepository.existsByUserIdAndProductId(userId, productId)) {
+        } else {
+            Favorite favorite = Favorite.builder()
+                    .product(productRepository.findById(productId).orElse(null))
+                    .user(userRepository.findById(userId).orElse(null))
+                    .build();
+            favoriteRepository.save(favorite);
+        }
+        return productRepository.findById(productId).orElse(null);
     }
 
 }
