@@ -1,13 +1,18 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.models.User;
 import com.project.shopapp.responses.ResponseObject;
 import com.project.shopapp.services.auth.AuthService;
 import com.project.shopapp.services.token.TokenService;
 import com.project.shopapp.services.user.UserService;
+import com.project.shopapp.utils.ValidationUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,8 +37,52 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> createUser() {
-        return ResponseEntity.ok("User registered successfully.");
+    public ResponseEntity<ResponseObject> createUser(
+            @Valid @RequestBody UserDTO userDTO,
+            BindingResult result
+    ) throws Exception {
+        if (result.hasErrors()) {
+            List<String> errorMessages = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
+            return ResponseEntity.badRequest().body(ResponseObject.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .data(null)
+                    .message(errorMessages.toString())
+                    .build()
+            );
+        }
+        if (userDTO.getEmail() == null || userDTO.getEmail().trim().isBlank()) {
+            if (userDTO.getPhoneNumber() == null || userDTO.getPhoneNumber().isBlank()) {
+                return ResponseEntity.badRequest().body(ResponseObject.builder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .data(null)
+                        .message("At least email or phone number is required")
+                        .build()
+                );
+            } else {
+                if (!ValidationUtils.isValidPhoneNumber(userDTO.getPhoneNumber())) {
+                    throw new Exception("Invalid phone number");
+                }
+            }
+        } else {
+            if (!ValidationUtils.isValidEmail(userDTO.getEmail())) {
+                throw new Exception("Invalid email format");
+            }
+        }
+        if (!userDTO.getPassword().equals(userDTO.getRetypePassword())) {
+            return ResponseEntity.badRequest().body(ResponseObject.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .data(null)
+                    .message("Passwords must match.")
+                    .build()
+            );
+        }
+        User user = userService.createUser(userDTO);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .status(HttpStatus.CREATED)
+                .data(user)
+                .message("User registered successfully.")
+                .build()
+        );
     }
 
     @PostMapping("/details")
