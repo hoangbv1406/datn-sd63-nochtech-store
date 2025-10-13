@@ -62,8 +62,16 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}")
-    public ResponseEntity<String> updateOrder(@PathVariable("orderId") Long orderId) {
-        return ResponseEntity.ok("Order updated successfully. orderId = " + orderId);
+    public ResponseEntity<ResponseObject> updateOrder(
+            @Valid @PathVariable("orderId") Long orderId,
+            @Valid @RequestBody OrderDTO orderDTO
+    ) throws Exception {
+        Order order = orderService.updateOrder(orderId, orderDTO);
+        return ResponseEntity.ok(new ResponseObject(
+                "Order updated successfully. orderId = " + orderId,
+                HttpStatus.OK,
+                order
+        ));
     }
 
     @DeleteMapping("/{orderId}")
