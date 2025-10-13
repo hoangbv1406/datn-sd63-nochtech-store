@@ -8,4 +8,5 @@ public interface OrderService {
     Order getOrderById(Long orderId);
     Order createOrder(OrderDTO orderDTO) throws Exception;
     Order updateOrder(Long id, OrderDTO orderDTO) throws DataNotFoundException;
+    void deleteOrder(Long orderId);
 }

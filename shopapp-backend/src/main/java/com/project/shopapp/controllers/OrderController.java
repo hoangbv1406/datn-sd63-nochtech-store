@@ -75,8 +75,12 @@ public class OrderController {
     }
 
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<String> deleteOrder(@PathVariable("orderId") Long orderId) {
-        return ResponseEntity.ok("Order deleted successfully. orderId = " + orderId);
+    public ResponseEntity<ResponseObject> deleteOrder(@PathVariable("orderId") Long orderId) {
+        orderService.deleteOrder(orderId);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .message("Order deleted successfully. orderId = " + orderId)
+                .build()
+        );
     }
 
     @GetMapping("/get-orders-by-keyword")

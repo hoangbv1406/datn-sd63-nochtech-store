@@ -130,4 +130,13 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
+    @Override
+    public void deleteOrder(Long orderId) {
+        Order order = getOrderById(orderId);
+        if (order != null) {
+            order.setActive(false);
+            orderRepository.save(order);
+        }
+    }
+
 }
