@@ -139,4 +139,31 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public Order updateOrderStatus(Long id, String status) throws IllegalArgumentException {
+        Order order = getOrderById(id);
+
+        if (status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Status cannot be null or empty");
+        }
+        if (!OrderStatus.VALID_STATUSES.contains(status)) {
+            throw new IllegalArgumentException("Invalid status: " + status);
+        }
+        String currentStatus = order.getStatus();
+        if (currentStatus.equals(OrderStatus.DELIVERED) && !status.equals(OrderStatus.CANCELLED)) {
+            throw new IllegalArgumentException("Cannot change status from DELIVERED to " + status);
+        }
+        if (currentStatus.equals(OrderStatus.CANCELLED)) {
+            throw new IllegalArgumentException("Cannot change status of a CANCELLED order");
+        }
+        if (status.equals(OrderStatus.CANCELLED)) {
+            if (!currentStatus.equals(OrderStatus.PENDING)) {
+                throw new IllegalArgumentException("Order can only be cancelled from PENDING status");
+            }
+        }
+
+        order.setStatus(status);
+        return orderRepository.save(order);
+    }
+
 }

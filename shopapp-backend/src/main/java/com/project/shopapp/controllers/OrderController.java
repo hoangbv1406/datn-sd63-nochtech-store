@@ -84,6 +84,20 @@ public class OrderController {
         );
     }
 
+    @PutMapping("/{orderId}/status")
+    public ResponseEntity<ResponseObject> updateOrderStatus(
+            @PathVariable("orderId") Long orderId,
+            @RequestParam("status") String status
+    ) throws Exception {
+        Order updatedOrder = orderService.updateOrderStatus(orderId, status);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .message("Order status updated successfully.")
+                .status(HttpStatus.OK)
+                .data(OrderResponse.fromOrder(updatedOrder))
+                .build()
+        );
+    }
+
     @PutMapping("/cancel/{orderId}")
     public ResponseEntity<ResponseObject> cancelOrder(@Valid @PathVariable("orderId") Long orderId) throws Exception {
         Order order = orderService.getOrderById(orderId);
@@ -122,14 +136,6 @@ public class OrderController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<String> getOrders(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok("Orders for user retrieved successfully. userId = " + userId);
-    }
-
-    @PutMapping("/{orderId}/status")
-    public ResponseEntity<String> updateOrderStatus(
-            @PathVariable("orderId") Long orderId,
-            @RequestParam("status") String status
-    ) {
-        return ResponseEntity.ok("Order status updated successfully.");
     }
 
 }
