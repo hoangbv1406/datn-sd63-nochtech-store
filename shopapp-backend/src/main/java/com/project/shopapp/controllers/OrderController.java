@@ -3,6 +3,7 @@ package com.project.shopapp.controllers;
 import com.project.shopapp.components.SecurityUtils;
 import com.project.shopapp.dtos.OrderDTO;
 import com.project.shopapp.models.Order;
+import com.project.shopapp.models.OrderStatus;
 import com.project.shopapp.models.User;
 import com.project.shopapp.responses.ResponseObject;
 import com.project.shopapp.responses.order.OrderResponse;
@@ -83,6 +84,36 @@ public class OrderController {
         );
     }
 
+    @PutMapping("/cancel/{orderId}")
+    public ResponseEntity<ResponseObject> cancelOrder(@Valid @PathVariable("orderId") Long orderId) throws Exception {
+        Order order = orderService.getOrderById(orderId);
+        User loginUser = securityUtils.getLoggedInUser();
+        if (loginUser.getId() != order.getUser().getId()) {
+            return ResponseEntity.badRequest().body(ResponseObject.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .data(null)
+                    .message("You do not have permission to cancel this order")
+                    .build()
+            );
+        }
+        if (order.getStatus().equals(OrderStatus.DELIVERED) || order.getStatus().equals(OrderStatus.SHIPPED) || order.getStatus().equals(OrderStatus.PROCESSING)) {
+            String message = "You cannot cancel an order with status: " + order.getStatus();
+            return ResponseEntity.badRequest().body(ResponseObject.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .data(null)
+                    .message(message)
+                    .build()
+            );
+        }
+        OrderDTO orderDTO = OrderDTO.builder().userId(order.getUser().getId()).status(OrderStatus.CANCELLED).build();
+        order = orderService.updateOrder(orderId, orderDTO);
+        return ResponseEntity.ok(new ResponseObject(
+                "Order cancelled successfully. orderId = " + orderId,
+                HttpStatus.OK,
+                order
+        ));
+    }
+
     @GetMapping("/get-orders-by-keyword")
     public ResponseEntity<String> getOrdersByKeyword() {
         return ResponseEntity.ok("Orders retrieved successfully.");
@@ -91,11 +122,6 @@ public class OrderController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<String> getOrders(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok("Orders for user retrieved successfully. userId = " + userId);
-    }
-
-    @PutMapping("/cancel/{orderId}")
-    public ResponseEntity<String> cancelOrder(@PathVariable("orderId") Long orderId) {
-        return ResponseEntity.ok("Order cancelled successfully. orderId = " + orderId);
     }
 
     @PutMapping("/{orderId}/status")
