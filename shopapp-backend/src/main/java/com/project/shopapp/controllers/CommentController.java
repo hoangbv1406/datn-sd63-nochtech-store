@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("api/v1/comments")
@@ -61,8 +62,24 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<String> updateComment(@PathVariable("commentId") Long commentId) {
-        return ResponseEntity.ok("Comment updated successfully. commentId = " + commentId);
+    public ResponseEntity<ResponseObject> updateComment(
+            @PathVariable("commentId") Long commentId,
+            @Valid @RequestBody CommentDTO commentDTO
+    ) throws Exception {
+        User loginUser = securityUtils.getLoggedInUser();
+        if (!Objects.equals(loginUser.getId(), commentDTO.getUserId())) {
+            return ResponseEntity.badRequest().body(new ResponseObject(
+                    "You cannot update another user's comment",
+                    HttpStatus.BAD_REQUEST,
+                    null)
+            );
+        }
+        commentService.updateComment(commentId, commentDTO);
+        return ResponseEntity.ok(new ResponseObject(
+                "Comment updated successfully. commentId = " + commentId,
+                HttpStatus.OK,
+                null)
+        );
     }
 
     @PostMapping("/generateFakeComments")
