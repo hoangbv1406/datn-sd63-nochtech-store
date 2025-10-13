@@ -26,6 +26,11 @@ public class OrderServiceImpl implements OrderService {
     private final ModelMapper modelMapper;
 
     @Override
+    public List<Order> getAllOrder() {
+        return orderRepository.findAll();
+    }
+
+    @Override
     public Order getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order == null) {

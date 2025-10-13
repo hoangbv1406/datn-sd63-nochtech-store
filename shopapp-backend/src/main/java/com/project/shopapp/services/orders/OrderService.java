@@ -8,6 +8,7 @@ import com.project.shopapp.responses.order.OrderResponse;
 import java.util.List;
 
 public interface OrderService {
+    List<Order> getAllOrder();
     Order getOrderById(Long orderId);
     Order createOrder(OrderDTO orderDTO) throws Exception;
     Order updateOrder(Long id, OrderDTO orderDTO) throws DataNotFoundException;

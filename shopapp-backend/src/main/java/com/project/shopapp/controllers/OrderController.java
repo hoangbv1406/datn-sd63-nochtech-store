@@ -25,6 +25,17 @@ public class OrderController {
     private final OrderService orderService;
     private final SecurityUtils securityUtils;
 
+    @GetMapping("")
+    public ResponseEntity<ResponseObject> getAllOrder() {
+        List<Order> order = orderService.getAllOrder();
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("Orders retrieved successfully.")
+                .status(HttpStatus.OK)
+                .data(order)
+                .build()
+        );
+    }
+
     @GetMapping("/{orderId}")
     public ResponseEntity<ResponseObject> getOrder(@PathVariable("orderId") Long orderId) {
         Order existingOrder = orderService.getOrderById(orderId);
@@ -126,11 +137,6 @@ public class OrderController {
                 HttpStatus.OK,
                 order
         ));
-    }
-
-    @GetMapping("/get-orders-by-keyword")
-    public ResponseEntity<String> getOrdersByKeyword() {
-        return ResponseEntity.ok("Orders retrieved successfully.");
     }
 
     @GetMapping("/user/{userId}")
