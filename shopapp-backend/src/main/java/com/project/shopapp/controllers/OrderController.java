@@ -5,6 +5,7 @@ import com.project.shopapp.dtos.OrderDTO;
 import com.project.shopapp.models.Order;
 import com.project.shopapp.models.User;
 import com.project.shopapp.responses.ResponseObject;
+import com.project.shopapp.responses.order.OrderResponse;
 import com.project.shopapp.services.orders.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,17 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final SecurityUtils securityUtils;
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<ResponseObject> getOrder(@PathVariable("orderId") Long orderId) {
+        Order existingOrder = orderService.getOrderById(orderId);
+        OrderResponse orderResponse = OrderResponse.fromOrder(existingOrder);
+        return ResponseEntity.ok(new ResponseObject(
+                "Order retrieved successfully. orderId = " + orderId,
+                HttpStatus.OK,
+                orderResponse
+        ));
+    }
 
     @PostMapping("")
     public ResponseEntity<ResponseObject> createOrder(
@@ -62,11 +74,6 @@ public class OrderController {
     @GetMapping("/get-orders-by-keyword")
     public ResponseEntity<String> getOrdersByKeyword() {
         return ResponseEntity.ok("Orders retrieved successfully.");
-    }
-
-    @GetMapping("/{orderId}")
-    public ResponseEntity<String> getOrder(@PathVariable("orderId") Long orderId) {
-        return ResponseEntity.ok("Order retrieved successfully. orderId = " + orderId);
     }
 
     @GetMapping("/user/{userId}")
