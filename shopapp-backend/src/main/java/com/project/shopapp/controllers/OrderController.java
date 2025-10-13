@@ -134,8 +134,16 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<String> getOrders(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok("Orders for user retrieved successfully. userId = " + userId);
+    public ResponseEntity<ResponseObject> getOrderByUser(@Valid @PathVariable("userId") Long userId) {
+        User loginUser = securityUtils.getLoggedInUser();
+        boolean isUserIdBlank = userId == null || userId <= 0;
+        List<OrderResponse> orderResponses = orderService.findByUserId(isUserIdBlank ? loginUser.getId() : userId);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .message("Orders for user retrieved successfully. userId = " + userId)
+                .data(orderResponses)
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
 }

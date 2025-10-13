@@ -5,6 +5,7 @@ import com.project.shopapp.dtos.OrderDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.models.*;
 import com.project.shopapp.repositories.*;
+import com.project.shopapp.responses.order.OrderResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -164,6 +165,12 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(status);
         return orderRepository.save(order);
+    }
+
+    @Override
+    public List<OrderResponse> findByUserId(Long userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        return orders.stream().map(order -> OrderResponse.fromOrder(order)).toList();
     }
 
 }
