@@ -1,7 +1,12 @@
 package com.project.shopapp.services.comment;
 
+import com.project.shopapp.dtos.CommentDTO;
 import com.project.shopapp.models.Comment;
+import com.project.shopapp.models.Product;
+import com.project.shopapp.models.User;
 import com.project.shopapp.repositories.CommentRepository;
+import com.project.shopapp.repositories.ProductRepository;
+import com.project.shopapp.repositories.UserRepository;
 import com.project.shopapp.responses.comment.CommentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +18,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public List<CommentResponse> getCommentsByUserAndProduct(Long userId, Long productId) {
@@ -24,6 +31,17 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentResponse> getCommentsByProduct(Long productId) {
         List<Comment> comments = commentRepository.findByProductId(productId);
         return comments.stream().map(comment -> CommentResponse.fromComment(comment)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Comment createComment(CommentDTO commentDTO) {
+        User user = userRepository.findById(commentDTO.getUserId()).orElse(null);
+        Product product = productRepository.findById(commentDTO.getProductId()).orElse(null);
+        if (user == null || product == null) {
+            throw new IllegalArgumentException("User or product not found");
+        }
+        Comment newComment = Comment.builder().user(user).product(product).content(commentDTO.getContent()).build();
+        return commentRepository.save(newComment);
     }
 
 }

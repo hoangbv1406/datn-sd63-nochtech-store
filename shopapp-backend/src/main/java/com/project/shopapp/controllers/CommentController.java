@@ -1,8 +1,12 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.components.SecurityUtils;
+import com.project.shopapp.dtos.CommentDTO;
+import com.project.shopapp.models.User;
 import com.project.shopapp.responses.ResponseObject;
 import com.project.shopapp.responses.comment.CommentResponse;
 import com.project.shopapp.services.comment.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
+    private final SecurityUtils securityUtils;
 
     @GetMapping("")
     public ResponseEntity<ResponseObject> getAllComments(
@@ -36,8 +41,23 @@ public class CommentController {
     }
 
     @PostMapping("")
-    public ResponseEntity<String> createComment() {
-        return ResponseEntity.ok("Comment created successfully.");
+    public ResponseEntity<ResponseObject> createComment(
+            @Valid @RequestBody CommentDTO commentDTO
+    ) {
+        User loginUser = securityUtils.getLoggedInUser();
+        if (loginUser.getId() != commentDTO.getUserId()) {
+            return ResponseEntity.badRequest().body(new ResponseObject(
+                    "You cannot comment as another user",
+                    HttpStatus.BAD_REQUEST,
+                    null)
+            );
+        }
+        commentService.createComment(commentDTO);
+        return ResponseEntity.ok(ResponseObject.builder()
+                .message("Comment created successfully.")
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
     @PutMapping("/{commentId}")
