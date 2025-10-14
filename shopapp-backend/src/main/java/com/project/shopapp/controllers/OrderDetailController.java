@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/order-details")
 @RequiredArgsConstructor
@@ -66,8 +68,15 @@ public class OrderDetailController {
     }
 
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<String> getOrderDetails(@PathVariable("orderId") Long orderId) {
-        return ResponseEntity.ok("Order details retrieved successfully. orderId = " + orderId);
+    public ResponseEntity<ResponseObject> getOrderDetails(@Valid @PathVariable("orderId") Long orderId) {
+        List<OrderDetail> orderDetails = orderDetailService.findByOrderId(orderId);
+        List<OrderDetailResponse> orderDetailResponses = orderDetails.stream().map(OrderDetailResponse::fromOrderDetail).toList();
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("Order details retrieved successfully. orderId = " + orderId)
+                .status(HttpStatus.OK)
+                .data(orderDetailResponses)
+                .build()
+        );
     }
 
 }

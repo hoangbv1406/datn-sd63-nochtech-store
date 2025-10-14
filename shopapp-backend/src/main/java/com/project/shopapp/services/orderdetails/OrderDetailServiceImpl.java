@@ -11,6 +11,8 @@ import com.project.shopapp.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OrderDetailServiceImpl implements OrderDetailService {
@@ -55,6 +57,11 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     @Override
     public void deleteById(Long id) {
         orderDetailRepository.deleteById(id);
+    }
+
+    @Override
+    public List<OrderDetail> findByOrderId(Long orderId) {
+        return orderDetailRepository.findByOrderId(orderId);
     }
 
 }
