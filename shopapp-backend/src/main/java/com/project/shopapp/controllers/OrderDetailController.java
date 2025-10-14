@@ -1,5 +1,6 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.dtos.OrderDetailDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
 import com.project.shopapp.models.OrderDetail;
 import com.project.shopapp.responses.ResponseObject;
@@ -30,8 +31,15 @@ public class OrderDetailController {
     }
 
     @PostMapping("")
-    public ResponseEntity<String> createOrderDetail() {
-        return ResponseEntity.ok("Order detail created successfully.");
+    public ResponseEntity<ResponseObject> createOrderDetail(@Valid @RequestBody OrderDetailDTO orderDetailDTO) throws Exception {
+        OrderDetail newOrderDetail = orderDetailService.createOrderDetail(orderDetailDTO);
+        OrderDetailResponse orderDetailResponse = OrderDetailResponse.fromOrderDetail(newOrderDetail);
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("Order detail created successfully.")
+                .status(HttpStatus.CREATED)
+                .data(orderDetailResponse)
+                .build()
+        );
     }
 
     @PutMapping("/{orderDetailId}")
