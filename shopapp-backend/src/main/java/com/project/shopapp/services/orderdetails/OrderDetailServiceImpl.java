@@ -52,4 +52,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         return orderDetailRepository.save(existingOrderDetail);
     }
 
+    @Override
+    public void deleteById(Long id) {
+        orderDetailRepository.deleteById(id);
+    }
+
 }

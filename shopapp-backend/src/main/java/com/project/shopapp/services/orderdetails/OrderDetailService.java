@@ -8,4 +8,5 @@ public interface OrderDetailService {
     OrderDetail getOrderDetail(Long id) throws DataNotFoundException;
     OrderDetail createOrderDetail(OrderDetailDTO newOrderDetail) throws Exception;
     OrderDetail updateOrderDetail(Long id, OrderDetailDTO newOrderDetailData) throws DataNotFoundException;
+    void deleteById(Long id);
 }

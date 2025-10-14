@@ -57,8 +57,12 @@ public class OrderDetailController {
     }
 
     @DeleteMapping("/{orderDetailId}")
-    public ResponseEntity<String> deleteOrderDetail(@PathVariable("orderDetailId") Long orderDetailId) {
-        return ResponseEntity.ok("Order detail deleted successfully. orderDetailId = " + orderDetailId);
+    public ResponseEntity<ResponseObject> deleteOrderDetail(@Valid @PathVariable("orderDetailId") Long orderDetailId) {
+        orderDetailService.deleteById(orderDetailId);
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("Order detail deleted successfully. orderDetailId = " + orderDetailId)
+                .build()
+        );
     }
 
     @GetMapping("/order/{orderId}")
