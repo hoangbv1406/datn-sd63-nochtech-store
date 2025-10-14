@@ -43,8 +43,17 @@ public class OrderDetailController {
     }
 
     @PutMapping("/{orderDetailId}")
-    public ResponseEntity<String> updateOrderDetail(@PathVariable("orderDetailId") Long orderDetailId) {
-        return ResponseEntity.ok("Order detail updated successfully. orderDetailId = " + orderDetailId);
+    public ResponseEntity<ResponseObject> updateOrderDetail(
+            @Valid @PathVariable("orderDetailId") Long orderDetailId,
+            @RequestBody OrderDetailDTO orderDetailDTO
+    ) throws Exception {
+        OrderDetail orderDetail = orderDetailService.updateOrderDetail(orderDetailId, orderDetailDTO);
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .data(orderDetail)
+                .message("Order detail updated successfully. orderDetailId = " + orderDetailId)
+                .status(HttpStatus.OK)
+                .build()
+        );
     }
 
     @DeleteMapping("/{orderDetailId}")
