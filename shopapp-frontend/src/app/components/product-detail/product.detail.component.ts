@@ -1,4 +1,4 @@
-// File: detail-product.component.ts
+// File: product.detail.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -10,9 +10,8 @@ import { FooterComponent } from '../footer/footer.component';
   selector: 'app-detail-product',
   standalone: true,
   imports: [CommonModule, RouterModule, HeaderComponent, FooterComponent],
-  templateUrl: './detail-product.component.html',
-  styleUrl: './detail-product.component.scss'
+  templateUrl: './product.detail.component.html',
+  styleUrl: './product.detail.component.scss'
 })
-
 export class DetailProductComponent {
 }
