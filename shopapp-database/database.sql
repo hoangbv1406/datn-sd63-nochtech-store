@@ -181,3 +181,7 @@ CREATE TABLE `order_details` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 COMMIT;
+
+INSERT INTO `roles` (`id`, `name`) VALUES
+(1, 'user'),
+(2, 'admin');
